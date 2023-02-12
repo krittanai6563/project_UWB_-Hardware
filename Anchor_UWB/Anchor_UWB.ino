@@ -36,6 +36,10 @@ void setup()
  
   //start the module as anchor, don't assign random short address
   DW1000Ranging.startAsAnchor(this_anchor_addr, DW1000.MODE_LONGDATA_RANGE_LOWPOWER, false);
+  DW1000.enableDebounceClock();
+  DW1000.enableLedBlinking();
+  DW1000.setGPIOMode(MSGP2, LED_MODE);
+  DW1000.setGPIOMode(MSGP3, LED_MODE);
  
 }
  
