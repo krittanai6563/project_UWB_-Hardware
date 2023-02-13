@@ -5,7 +5,7 @@
 // connection pins
 const uint8_t PIN_RST = PB12; // reset pin
 const uint8_t PIN_IRQ = PB0; // irq pin
-const uint8_t PIN_SS = PA4;   // spi select pin
+const uint8_t PIN_SS = SS;   // spi select pin
  
 // TAG antenna delay defaults to 16384
 // leftmost two bytes below will become the "short address"
