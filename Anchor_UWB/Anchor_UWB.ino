@@ -1,16 +1,25 @@
+#include<I2C_Anything.h>
+#include<Wire.h>
+
 #include <SPI.h>
 #include "DW1000Ranging.h"
 #include "DW1000.h"
+
+
+const byte slave_address_one = 8;
+float pa,f;
+long dataLen;
+
  
 const uint8_t PIN_RST = PB12; // reset pin
 const uint8_t PIN_IRQ = PB0; // irq pin
 const uint8_t PIN_SS = PA4;   // spi select pin
  
  
-char this_anchor_addr[] = "84:00:22:EA:82:60:3B:9C";
+char this_anchor_addr[] = "82:00:22:EA:82:60:3B:9C";
 float this_anchor_target_distance = 1; //measured distance to anchor in m
  
-uint16_t this_anchor_Adelay = 16600; //starting value
+uint16_t this_anchor_Adelay = 16611; //starting value
 uint16_t Adelay_delta = 100; //initial binary search step size
  
  
@@ -18,6 +27,10 @@ void setup()
 {
   Serial.begin(115200);
   while (!Serial);
+
+  Wire.begin();
+ 
+  dataLen=sizeof(f);
 
 
   DW1000Ranging.initCommunication(PIN_RST, PIN_SS, PIN_IRQ); 
@@ -29,8 +42,8 @@ void setup()
   DW1000.setAntennaDelay(this_anchor_Adelay);
  
   DW1000Ranging.attachNewRange(newRange);
-  DW1000Ranging.attachNewDevice(newDevice);
-  DW1000Ranging.attachInactiveDevice(inactiveDevice);
+//  DW1000Ranging.attachNewDevice(newDevice);
+//  DW1000Ranging.attachInactiveDevice(inactiveDevice);
   //Enable the filter to smooth the distance
   //DW1000Ranging.useRangeFilter(true);
  
@@ -45,13 +58,21 @@ void setup()
  
 void loop()
 {
+
+  Wire.requestFrom(slave_address_one,dataLen);
+while(Wire.available()==dataLen)
+{
+I2C_readAnything(f);
+Serial.print(f);
+}
+
   DW1000Ranging.loop();
 }
  
 void newRange()
 {
   static float last_delta = 0.0;
-  Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), DEC);
+  Serial.print(DW1000Ranging.getDistantDevice()->getShortAddress(), HEX);
  
   float dist = 0;
   for (int i = 0; i < 100; i++) {
@@ -81,16 +102,24 @@ void newRange()
   Serial.println (this_anchor_Adelay);
 //  DW1000Ranging.initCommunication(PIN_RST, PIN_SS, PIN_IRQ); //Reset, CS, IRQ pin
   DW1000.setAntennaDelay(this_anchor_Adelay);
+
+  pa= dist;
+  Serial.print("\t Range: "); Serial.print(pa); Serial.print(" m");
+  Wire.beginTransmission(slave_address_one);
+  I2C_writeAnything(pa);
+  Wire.endTransmission(slave_address_one);
+  
+  
 }
  
-void newDevice(DW1000Device *device)
-{
-  Serial.print("Device added: ");
-  Serial.println(device->getShortAddress(), HEX);
-}
- 
-void inactiveDevice(DW1000Device *device)
-{
-  Serial.print("delete inactive device: ");
-  Serial.println(device->getShortAddress(), HEX);
-}
+//void newDevice(DW1000Device *device)
+//{
+//  Serial.print("Device added: ");
+//  Serial.println(device->getShortAddress(), HEX);
+//}
+// 
+//void inactiveDevice(DW1000Device *device)
+//{
+//  Serial.print("delete inactive device: ");
+//  Serial.println(device->getShortAddress(), HEX);
+//}
