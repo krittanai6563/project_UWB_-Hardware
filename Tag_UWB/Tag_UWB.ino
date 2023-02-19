@@ -21,7 +21,7 @@ void setup()
  
   DW1000Ranging.attachNewRange(newRange);
   DW1000Ranging.attachNewDevice(newDevice);
-  DW1000Ranging.attachInactiveDevice(inactiveDevice);
+//  DW1000Ranging.attachInactiveDevice(inactiveDevice);
  
 // start as tag, do not assign random short address
  
@@ -51,8 +51,8 @@ void newDevice(DW1000Device *device)
   Serial.println(device->getShortAddress(), HEX);
 }
  
-void inactiveDevice(DW1000Device *device)
-{
-  Serial.print("delete inactive device: ");
-  Serial.println(device->getShortAddress(), HEX);
-}
+//void inactiveDevice(DW1000Device *device)
+//{
+//  Serial.print("delete inactive device: ");
+//  Serial.println(device->getShortAddress(), HEX);
+//}
